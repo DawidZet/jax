@@ -1899,7 +1899,7 @@ class LazyConstantTest(jtu.JaxTestCase):
     py_op = op(py_val)
     lax_op = op(lax_val)
 
-    self.assertEqual(py_op, lax_op)
+    self.assertAllClose(py_op, lax_op, check_dtypes=False)
     self.assertTrue(py_op.aval.weak_type)
     self.assertFalse(lax_op.aval.weak_type)
 
