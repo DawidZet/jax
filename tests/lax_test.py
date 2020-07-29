@@ -1903,6 +1903,22 @@ class LazyConstantTest(jtu.JaxTestCase):
     self.assertTrue(py_op.aval.weak_type)
     self.assertFalse(lax_op.aval.weak_type)
 
+  @parameterized.named_parameters(jtu.cases_from_list(
+        {"testcase_name": "_{}".format(dtype.__name__),
+         "dtype": dtype}
+      for dtype in float_dtypes))
+  def testUnaryJitInvariance(self, dtype):
+    # https://github.com/google/jax/pull/3903
+    x = lax.full((10,), 1, dtype=dtype)
+
+    def f(x, y):
+      return x + abs(y)
+
+    self.assertAllClose(
+      f(x, 1.0),
+      api.jit(f)(x, 1.0)
+    )
+
 
 if __name__ == '__main__':
   absltest.main(testLoader=jtu.JaxTestLoader())
