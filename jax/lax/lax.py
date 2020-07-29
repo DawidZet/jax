@@ -1883,7 +1883,7 @@ def standard_abstract_eval(prim, shape_rule, dtype_rule, *args, **kwargs):
   if least_specialized is ConcreteArray:
     return ConcreteArray(prim.impl(*[x.val for x in args], **kwargs))
   elif least_specialized is ShapedArray:
-    return ShapedArray(shape_rule(*args, **kwargs), dtype_rule(*args, **kwargs))
+    return ShapedArray(shape_rule(*args, **kwargs), dtype_rule(*args, **kwargs), weak_type=all(aval.weak_type for aval in args))
   elif least_specialized is UnshapedArray:
     return UnshapedArray(dtype_rule(*args, **kwargs))
   else:
