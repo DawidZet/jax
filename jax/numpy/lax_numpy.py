@@ -473,7 +473,7 @@ def copysign(x1, x2):
   if issubdtype(_dtype(x1), complexfloating) or issubdtype(_dtype(x2), complexfloating):
     raise TypeError("copysign does not support complex-valued inputs")
   x1, x2 = _promote_shapes("copysign", x1, x2)
-  return where(signbit(x2), -lax.abs(x1), lax.abs(x1))
+  return where(signbit(x2), -abs(x1), abs(x1))
 
 
 @_wraps(np.true_divide)
