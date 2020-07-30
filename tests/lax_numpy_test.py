@@ -4191,22 +4191,21 @@ _all_dtypes: List[str] = [
 
 
 def _all_numpy_ufuncs() -> Iterator[str]:
-  """Generate the names of all numpy ufuncs."""
+  """Generate the names of all ufuncs in the top-level numpy namespace."""
   for name in dir(np):
     f = getattr(np, name)
     if isinstance(f, np.ufunc):
       yield name
 
 
+@jtu.ignore_warning(category=RuntimeWarning, message="divide by zero")
 def _dtypes_for_ufunc(name: str) -> Iterator[Tuple[str, ...]]:
-  """Generate valid dtypes of inputs to the given ufunc."""
-  f = getattr(np, name)
-  for arg_dtypes in itertools.product(*(f.nin * (_all_dtypes,))):
-    input = (np.ones(1, dtype=dtype) for dtype in arg_dtypes)
+  """Generate valid dtypes of inputs to the given numpy ufunc."""
+  func = getattr(np, name)
+  for arg_dtypes in itertools.product(*(func.nin * (_all_dtypes,))):
+    args = (np.ones(1, dtype=dtype) for dtype in arg_dtypes)
     try:
-      with warnings.catch_warnings():
-        warnings.filterwarnings("ignore", category=RuntimeWarning, message="divide by zero")
-        _ = f(*input)
+        _ = func(*args)
     except TypeError:
       pass
     else:
@@ -4222,14 +4221,11 @@ class NumpyUfuncTests(jtu.JaxTestCase):
   def testUfuncInputTypes(self, name, arg_dtypes):
     for dtype in arg_dtypes:
       jtu.skip_if_unsupported_type(dtype)
-    np_op = getattr(np, name)
-    jnp_op = getattr(jnp, name)
 
-    np_op = jtu.ignore_warning(category=RuntimeWarning,
-                               message="invalid value.*")(np_op)
+    jnp_op = getattr(jnp, name)
+    np_op = getattr(np, name)
     np_op = jtu.ignore_warning(category=RuntimeWarning,
                                message="divide by zero.*")(np_op)
-
     args_maker = lambda: tuple(np.ones(1, dtype=dtype) for dtype in arg_dtypes)
 
     try:
@@ -4239,8 +4235,7 @@ class NumpyUfuncTests(jtu.JaxTestCase):
 
     # large tol comes from the fact that numpy returns float16 in places
     # that jnp returns float32. e.g. np.cos(np.uint8(0))
-    self._CheckAgainstNumpy(np_op, jnp_op, args_maker,
-                            check_dtypes=False, tol=1E-2)
+    self._CheckAgainstNumpy(np_op, jnp_op, args_maker, check_dtypes=False, tol=1E-2)
 
 
 if __name__ == "__main__":
