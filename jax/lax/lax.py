@@ -5733,8 +5733,8 @@ def _dynamic_slice_indices(operand, start_indices):
 
 
 
-def _const(example, val):
-  if dtypes.is_python_scalar(example):
+def _const(example, val, allow_python_scalar=True):
+  if allow_python_scalar and dtypes.is_python_scalar(example):
     return dtypes.scalar_type_of(example)(val)
   return np.array(val, _dtype(example))
 

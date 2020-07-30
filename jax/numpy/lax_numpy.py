@@ -890,7 +890,7 @@ def histogram(a, bins=10, range=None, weights=None, density=None):
 @_wraps(np.heaviside)
 def heaviside(x1, x2):
   x1, x2 = _promote_dtypes_inexact(x1, x2)
-  zero = lax._const(x1, 0)
+  zero = lax._const(x1, 0, allow_python_scalar=False)
   return where(lax.lt(x1, zero), zero,
                where(lax.gt(x1, zero), lax._const(x1, 1), x2))
 
