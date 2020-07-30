@@ -4065,6 +4065,16 @@ class NumpyGradTests(jtu.JaxTestCase):
 
     check_grads(f, (1.,), order=1)
 
+  def testWeakTypes(self):
+    x = jnp.arange(4)
+    self.assertTrue(jnp.full((), 1).aval.weak_type)
+    self.assertFalse(jnp.full((), 1, dtype='int32').aval.weak_type)
+    self.assertTrue(jnp.array(1).aval.weak_type)
+    self.assertFalse(jnp.array(1, dtype='int32').aval.weak_type)
+    self.assertTrue(jnp.asarray(1).aval.weak_type)
+    self.assertFalse(jnp.asarray(1, dtype='int32').aval.weak_type)
+    self.assertFalse(jnp.full_like(x, 1).aval.weak_type)
+
 
 class NumpySignaturesTest(jtu.JaxTestCase):
 

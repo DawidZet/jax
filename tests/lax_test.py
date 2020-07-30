@@ -1903,6 +1903,16 @@ class LazyConstantTest(jtu.JaxTestCase):
     self.assertTrue(py_op.aval.weak_type)
     self.assertFalse(lax_op.aval.weak_type)
 
+
+  def testFullWeakTypes(self):
+    self.assertTrue(lax.full((), 0).aval.weak_type)
+    self.assertTrue(lax.full((), 0.0).aval.weak_type)
+    self.assertFalse(lax.full((), 0, dtype='int32').aval.weak_type)
+    self.assertFalse(lax.full((), 0.0, dtype='int32').aval.weak_type)
+    self.assertFalse(lax.full((), np.int32(0)).aval.weak_type)
+    self.assertFalse(lax.full((), np.float32(0)).aval.weak_type)
+
+
   @parameterized.named_parameters(jtu.cases_from_list(
         {"testcase_name": "_{}".format(dtype.__name__),
          "dtype": dtype}

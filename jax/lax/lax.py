@@ -1369,20 +1369,24 @@ def full(shape: Shape, fill_value: Array, dtype: Optional[DType] = None) -> Arra
   if np.shape(fill_value):
     msg = "full must be called with scalar fill_value, got fill_value.shape {}."
     raise TypeError(msg.format(np.shape(fill_value)))
+  weak_type = dtype is None and dtypes.is_weakly_typed(fill_value)
   dtype = dtypes.canonicalize_dtype(dtype or _dtype(fill_value))
+  fill_value = convert_element_type(fill_value, dtype)
   if config.omnistaging_enabled:
-    fill_value = convert_element_type(fill_value, dtype)
     if not isinstance(fill_value, (xla.DeviceArray, core.Tracer)):
-      fill_value = _device_put_raw(fill_value)
+      fill_value = _device_put_raw(fill_value, weak_type=weak_type)
   else:
-    fill_value = xla.device_put_p.bind(convert_element_type(fill_value, dtype))
-  return broadcast(fill_value, shape)
+    fill_value = xla.device_put_p.bind(fill_value)
+    fill_value.aval.weak_type = weak_type
+  arr = broadcast(fill_value, shape)
+  arr.aval.weak_type = weak_type
+  return arr
 
 def _device_put_raw(x):
   if isinstance(x, xla.DeviceArray):
     return x
   else:
-    aval = raise_to_shaped(core.get_aval(x))
+    aval = raise_to_shaped(core.get_aval(x), weak_type=weak_type)
     return xla.array_result_handler(None, aval)(xla.device_put(x))
 
 def iota(dtype: DType, size: int) -> Array:
