@@ -4209,7 +4209,7 @@ def _dtypes_for_ufunc(name: str) -> Iterator[Tuple[str, ...]]:
     except TypeError:
       pass
     else:
-      yield dtypes
+      yield arg_dtypes
 
 
 class NumpyUfuncTests(jtu.JaxTestCase):
