@@ -265,5 +265,5 @@ def result_type(*args):
   for x in args:
     (weak_dtypes if is_weakly_typed(x) else dtypes).append(dtype(x))
   array_priority = max(map(_dtype_priority, dtypes)) if dtypes else -1
-  dtypes += [x for x in weak_dtypes if _dtype_priority(x) > array_priority]
+  dtypes.extend(dt for dt in weak_dtypes if _dtype_priority(dt) > array_priority)
   return canonicalize_dtype(functools.reduce(promote_types, dtypes))

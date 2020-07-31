@@ -531,7 +531,7 @@ class ShardedDeviceArray(xla.DeviceArray):
     # creating pmap-style ShardedDeviceArrays.
     if device_buffers is None:
       device_buffers = sharding_spec
-      sharded_aval = ShapedArray(aval.shape[1:], aval.dtype)
+      sharded_aval = ShapedArray(aval.shape[1:], aval.dtype, weak_type=aval.weak_type)
       sharding_spec = _pmap_sharding_spec(aval.shape[0], aval.shape[0],
                                           1, None, sharded_aval, True)
 
@@ -546,6 +546,8 @@ class ShardedDeviceArray(xla.DeviceArray):
     self._one_replica_buffer_indices = None
     if not core.skip_checks:
       assert type(aval) is ShapedArray
+
+  # TODO(jakevdp): customize _strip_weak_type
 
   @property
   def one_replica_buffer_indices(self):

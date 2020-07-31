@@ -388,13 +388,15 @@ def convert_element_type(operand: Array, new_dtype: DType) -> Array:
     operand = np.asarray(operand, new_dtype)
   old_dtype = dtypes.canonicalize_dtype(_dtype(operand))
   if old_dtype == new_dtype:
+    if hasattr(operand, '_strip_weak_type'):
+      return operand._strip_weak_type()
     return operand
   if (dtypes.issubdtype(old_dtype, np.complexfloating) and
       not dtypes.issubdtype(new_dtype, np.complexfloating)):
     msg = "Casting complex values to real discards the imaginary part"
     warnings.warn(msg, np.ComplexWarning, stacklevel=2)
   return convert_element_type_p.bind(
-      operand, new_dtype=new_dtype, old_dtype=old_dtype)
+      operand, new_dtype=new_dtype, old_dtype=old_dtype)._strip_weak_type()
 
 def bitcast_convert_type(operand: Array, new_dtype: DType) -> Array:
   """Elementwise bitcast.

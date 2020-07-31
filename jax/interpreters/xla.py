@@ -14,6 +14,7 @@
 
 
 from collections import defaultdict, deque, namedtuple
+from copy import copy as _copy
 import itertools as it
 import operator as op
 from typing import Any, Callable, Dict, List, Optional, Sequence, Set, Type, Tuple
@@ -988,6 +989,11 @@ class DeviceArray:
     self._check_if_deleted()
     self.device_buffer.block_host_until_ready()
     return self
+    
+  def _strip_weak_type(self):
+    return DeviceArray(
+      aval=self.aval.strip_weak_type(), device=self._device,
+      lazy_expr=self._lazy_expr, device_buffer=self.device_buffer)
 
   @property
   def _value(self):
