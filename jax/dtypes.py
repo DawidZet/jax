@@ -20,6 +20,7 @@
 # so we need our own implementation that deviates from NumPy in places.
 
 
+from copy import copy as _copy
 from distutils.util import strtobool
 import functools
 import os

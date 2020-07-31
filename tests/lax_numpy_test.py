@@ -4079,8 +4079,9 @@ class NumpyGradTests(jtu.JaxTestCase):
 
     assert_strong_typed(x_weak.astype('int32'))
 
+    assert_strong_typed(x_strong + x_strong)
     assert_strong_typed(x_weak + x_strong)
-    # assert_weak_typed(x_weak + x_weak)
+    assert_weak_typed(x_weak + x_weak)
 
     assert_weak_typed(jnp.array(1))
     assert_weak_typed(jnp.asarray(1))
@@ -4088,9 +4089,9 @@ class NumpyGradTests(jtu.JaxTestCase):
     assert_strong_typed(jnp.array(1, dtype='int32'))
     assert_strong_typed(jnp.asarray(1, dtype='int32'))
 
-    # assert_weak_typed(jnp.zeros_like(x_weak))
-    # assert_weak_typed(jnp.ones_like(x_weak))
-    # assert_weak_typed(jnp.full_like(x_weak, 0))
+    assert_weak_typed(jnp.zeros_like(x_weak))
+    assert_weak_typed(jnp.ones_like(x_weak))
+    assert_weak_typed(jnp.full_like(x_weak, 0))
     
     assert_strong_typed(jnp.zeros_like(x_strong))
     assert_strong_typed(jnp.ones_like(x_strong))

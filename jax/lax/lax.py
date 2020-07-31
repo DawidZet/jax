@@ -1648,7 +1648,11 @@ def full_like(x: Array, fill_value: Array, dtype: Optional[DType] = None,
   fill_shape = np.shape(x) if shape is None else canonicalize_shape(shape)
   if not config.omnistaging_enabled:
     fill_value = tie_in(x, fill_value)
-  return full(fill_shape, fill_value, dtype or _dtype(x))
+  result = full(fill_shape, fill_value, dtype or _dtype(x))
+  result.aval.weak_type = (dtype is None and
+                           dtypes.is_weakly_typed(fill_value) and
+                           dtypes.is_weakly_typed(x))
+  return result
 
 
 def collapse(operand: Array, start_dimension: int, stop_dimension: int) -> Array:

@@ -264,7 +264,12 @@ def _promote_dtypes(*args):
     return args
   else:
     to_dtype = result_type(*args)
-    return [lax.convert_element_type(x, to_dtype) for x in args]
+    # TODO(jakevdp): express this functionally.
+    result = [lax.convert_element_type(x, to_dtype) for x in args]
+    if _all(dtypes.is_weakly_typed(a) for a in args):
+      for r in result:
+        r.aval.weak_type = True
+    return result
 
 def _promote_dtypes_inexact(*args):
   """Convenience function to apply Numpy argument dtype promotion.
