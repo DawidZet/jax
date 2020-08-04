@@ -11,7 +11,7 @@
 | [**Reference docs**](https://jax.readthedocs.io/en/latest/)
 | [**Code search**](https://cs.opensource.google/jax/jax)
 
-## What is JAX?
+## Explanation What is JAX?
 
 JAX is [Autograd](https://github.com/hips/autograd) and
 [XLA](https://www.tensorflow.org/xla),
